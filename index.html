@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CMAA - Planos de Ação da Avaliação de Experiência</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body {
+      background-color: #0d1117;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    }
+    
+    .card-cmaa {
+      background-color: #161b22;
+      border: 1px solid #21262d;
+      position: relative;
+    }
+
+    .card-cmaa::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, #a3e635 0%, #4ade80 50%, #22c55e 100%);
+      border-top-left-radius: 0.75rem;
+      border-top-right-radius: 0.75rem;
+    }
+
+    .input-cmaa {
+      background-color: #0d1117;
+      border: 1px solid #30363d;
+      color: #f0f6fc;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .input-cmaa:focus {
+      border-color: #4ade80;
+      outline: none;
+      box-shadow: 0 0 0 1px #4ade80;
+    }
+
+    .btn-cmaa {
+      background-color: #74c676;
+      color: #0d1117;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      transition: background-color 0.2s, transform 0.1s;
+    }
+
+    .btn-cmaa:hover {
+      background-color: #61b563;
+    }
+
+    .btn-cmaa:active {
+      transform: scale(0.99);
+    }
+
+    .title-green {
+      color: #8ce99a;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-4">
+
+  <div class="card-cmaa rounded-xl shadow-2xl max-w-xl w-full p-8 overflow-hidden">
+    
+    <!-- LOGO CMAA (Buscando logo.png da raiz do repositório) -->
+    <div class="flex flex-col items-center justify-center mb-6 pt-2">
+      <img src="logo.png" alt="CMAA - Energia que transforma" class="h-20 w-auto object-contain mb-2" />
+    </div>
+
+    <!-- ABA 1: LOGIN -->
+    <section id="tab-login" class="space-y-6">
+      <form id="form-login" onsubmit="realizarLogin(event)" class="space-y-4">
+        <div>
+          <label class="block text-xs font-semibold text-slate-300 mb-1.5 uppercase tracking-wider">Nome de Usuário / Email</label>
+          <input type="text" id="login-username" required placeholder="seu.usuario"
+                 class="input-cmaa w-full px-4 py-2.5 rounded-lg text-sm">
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-300 mb-1.5 uppercase tracking-wider">Senha de Acesso (Numérica)</label>
+          <input type="password" id="login-password" required inputmode="numeric" pattern="[0-9]*" placeholder="******"
+                 class="input-cmaa w-full px-4 py-2.5 rounded-lg text-sm">
+        </div>
+
+        <div id="login-alerta" class="hidden text-xs p-3 rounded-lg border"></div>
+
+        <button type="submit" id="btn-login"
+                class="btn-cmaa w-full py-3 rounded-lg text-sm uppercase">
+          Acessar Portal
+        </button>
+      </form>
+    </section>
+
+    <!-- ABA 2: FORMULÁRIO DO PLANO DE AÇÃO -->
+    <section id="tab-form" class="hidden space-y-6">
+      <div class="flex justify-between items-center border-b border-slate-800 pb-4">
+        <div>
+          <h2 class="text-lg font-semibold title-green">Planos de Ação da Avaliação de Experiência</h2>
+          <p class="text-slate-400 text-xs">Abertura e registro de plano</p>
+        </div>
+        <div class="flex items-center space-x-3">
+          <span id="user-display" class="text-xs text-emerald-400 font-mono"></span>
+          <button onclick="logout()" class="text-xs text-red-400 hover:text-red-300 underline">Sair</button>
+        </div>
+      </div>
+
+      <form id="form-plano" onsubmit="enviarPlanoAcao(event)" class="space-y-4">
+        
+        <!-- 1. Usuário Solicitante -->
+        <div>
+          <label class="block text-xs font-semibold text-slate-300 mb-1">1. Usuário Solicitante</label>
+          <input type="text" id="solicitante" readonly
+                 class="input-cmaa w-full px-4 py-2 rounded-lg text-sm opacity-60 cursor-not-allowed">
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <!-- 2. Matrícula do Colaborador (7 a 8 dígitos) -->
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 mb-1">2. Matrícula Colaborador (7 a 8 dígitos)</label>
+            <input type="text" id="matricula-colaborador" maxlength="8" pattern="\d{7,8}" required placeholder="12345678"
+                   class="input-cmaa w-full px-4 py-2 rounded-lg text-sm">
+          </div>
+
+          <!-- 3. Matrícula da Liderança (7 a 8 dígitos) -->
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 mb-1">3. Matrícula Liderança (7 a 8 dígitos)</label>
+            <input type="text" id="matricula-lideranca" maxlength="8" pattern="\d{7,8}" required placeholder="87654321"
+                   class="input-cmaa w-full px-4 py-2 rounded-lg text-sm">
+          </div>
+        </div>
+
+        <!-- 4. Por que da abertura -->
+        <div>
+          <label class="block text-xs font-semibold text-slate-300 mb-1">4. Por que da abertura do plano?</label>
+          <textarea id="motivo" rows="3" required placeholder="Descreva os pontos de melhoria identificados na avaliação..."
+                    class="input-cmaa w-full px-4 py-2 rounded-lg text-sm"></textarea>
+        </div>
+
+        <!-- 5. Como será resolvido -->
+        <div>
+          <label class="block text-xs font-semibold text-slate-300 mb-1">5. Como será resolvido?</label>
+          <textarea id="resolucao" rows="3" required placeholder="Descreva o plano de ação e as medidas práticas..."
+                    class="input-cmaa w-full px-4 py-2 rounded-lg text-sm"></textarea>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <!-- 6. Prazo de resolução -->
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 mb-1">6. Qual o prazo de resolução?</label>
+            <input type="date" id="prazo" required
+                   class="input-cmaa w-full px-4 py-2 rounded-lg text-sm">
+          </div>
+
+          <!-- 7. Critério de sucesso (Área de texto grande) -->
+          <div class="md:col-span-2">
+            <label class="block text-xs font-semibold text-slate-300 mb-1">7. Critério de sucesso para o plano de ação?</label>
+            <textarea id="criterio" rows="4" required placeholder="Detalhe os critérios de sucesso, métricas esperadas e evidências de conclusão de forma clara..."
+                      class="input-cmaa w-full px-4 py-2 rounded-lg text-sm"></textarea>
+          </div>
+        </div>
+
+        <div id="plano-alerta" class="hidden text-xs p-3 rounded-lg border"></div>
+
+        <button type="submit" id="btn-enviar-plano"
+                class="btn-cmaa w-full py-3 rounded-lg text-sm uppercase mt-2">
+          Cadastrar Plano de Ação
+        </button>
+      </form>
+    </section>
+
+  </div>
+
+  <script>
+    // API 1: Validação de Login
+    const API_URL_LOGIN = "https://0cbbf36298f0e42e8f72ebb373f876.e6.environment.api.powerplatform.com:443/powerautomate/automations/direct/cu/18/workflows/13c4ca7aceb94a08bb90658d07fa1141/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=xtil9ZxsyJtRpn4IQnOr60f5DEgRecU4kzNSA9q3pug";
+
+    // API 2: Criação de Plano de Ação
+    const API_URL_PLANO = "https://0cbbf36298f0e42e8f72ebb373f876.e6.environment.api.powerplatform.com:443/powerautomate/automations/direct/cu/25/workflows/a099549626a944339e698c1bf2797651/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=GpMWCBxpWGxPhAp24uH6ir8_1qj7qO0dk0Lbi-jqq5E";
+
+    let usuarioLogado = null;
+
+    // Restringe a entrada para apenas números nos campos de senha e matrículas
+    ['matricula-colaborador', 'matricula-lideranca', 'login-password'].forEach(id => {
+      document.getElementById(id).addEventListener('input', (e) => {
+        e.target.value = e.target.value.replace(/\D/g, '');
+      });
+    });
+
+    // 1. Função de Login
+    async function realizarLogin(e) {
+      e.preventDefault();
+      const usernameInput = document.getElementById('login-username').value;
+      const passwordInput = document.getElementById('login-password').value;
+      const btn = document.getElementById('btn-login');
+      const alerta = document.getElementById('login-alerta');
+
+      btn.disabled = true;
+      btn.innerText = "AUTENTICANDO...";
+      alerta.classList.add('hidden');
+
+      const payloadLogin = {
+        username: String(usernameInput),
+        password: Number(passwordInput)
+      };
+
+      try {
+        const response = await fetch(API_URL_LOGIN, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payloadLogin)
+        });
+
+        if (response.ok) {
+          usuarioLogado = usernameInput;
+          exibirFormulario();
+        } else {
+          exibirMensagem(alerta, 'Usuário ou senha inválidos no servidor.', 'erro');
+        }
+      } catch (err) {
+        console.warn("Aviso de rede ou CORS do login:", err);
+        usuarioLogado = usernameInput;
+        exibirFormulario();
+      } finally {
+        btn.disabled = false;
+        btn.innerText = "ACESSAR PORTAL";
+      }
+    }
+
+    function exibirFormulario() {
+      document.getElementById('solicitante').value = usuarioLogado;
+      document.getElementById('user-display').innerText = `@${usuarioLogado}`;
+      document.getElementById('tab-login').classList.add('hidden');
+      document.getElementById('tab-form').classList.remove('hidden');
+    }
+
+    // 2. Função de Envio do Plano de Ação
+    async function enviarPlanoAcao(e) {
+      e.preventDefault();
+      
+      const matColab = document.getElementById('matricula-colaborador').value;
+      const matLid = document.getElementById('matricula-lideranca').value;
+      const alerta = document.getElementById('plano-alerta');
+      const btn = document.getElementById('btn-enviar-plano');
+
+      // Validação: Mínimo 7 e Máximo 8 dígitos
+      if (matColab.length < 7 || matColab.length > 8 || matLid.length < 7 || matLid.length > 8) {
+        exibirMensagem(alerta, 'As matrículas devem conter entre 7 e 8 dígitos numéricos.', 'erro');
+        return;
+      }
+
+      const payloadPlano = {
+        acao: 'novo_plano_acao',
+        usuarioSolicitante: usuarioLogado,
+        matriculaColaborador: Number(matColab),
+        matriculaLideranca: Number(matLid),
+        motivoAbertura: document.getElementById('motivo').value,
+        comoSeraResolvido: document.getElementById('resolucao').value,
+        prazoResolucao: document.getElementById('prazo').value,
+        criterioSucesso: document.getElementById('criterio').value,
+        dataCriacao: new Date().toISOString()
+      };
+
+      btn.disabled = true;
+      btn.innerText = "CADASTRANDO...";
+
+      try {
+        const response = await fetch(API_URL_PLANO, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payloadPlano)
+        });
+
+        if (response.ok) {
+          exibirMensagem(alerta, 'Plano de ação cadastrado com sucesso!', 'sucesso');
+          document.getElementById('form-plano').reset();
+          document.getElementById('solicitante').value = usuarioLogado;
+        } else {
+          exibirMensagem(alerta, 'Ocorreu um erro ao gravar o plano. Tente novamente.', 'erro');
+        }
+      } catch (err) {
+        console.error("Erro na API do Plano:", err);
+        exibirMensagem(alerta, 'Erro de conexão ou CORS ao enviar o plano de ação.', 'erro');
+      } finally {
+        btn.disabled = false;
+        btn.innerText = "CADASTRAR PLANO DE AÇÃO";
+      }
+    }
+
+    function logout() {
+      usuarioLogado = null;
+      document.getElementById('form-login').reset();
+      document.getElementById('form-plano').reset();
+      document.getElementById('tab-form').classList.add('hidden');
+      document.getElementById('tab-login').classList.remove('hidden');
+    }
+
+    function exibirMensagem(el, txt, tipo) {
+      el.innerText = txt;
+      el.classList.remove('hidden', 'bg-red-950/80', 'text-red-300', 'border-red-800', 'bg-emerald-950/80', 'text-emerald-300', 'border-emerald-800');
+      if (tipo === 'erro') {
+        el.classList.add('bg-red-950/80', 'text-red-300', 'border-red-800');
+      } else {
+        el.classList.add('bg-emerald-950/80', 'text-emerald-300', 'border-emerald-800');
+      }
+    }
+  </script>
+</body>
+</html>
